@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Unity 없이 Assets/Scripts 전체(Unity 층 포함)를 실제 UnityEngine 참조 어셈블리로 컴파일해 보는 검사.
+    참조 DLL은 check.sh가 BepInEx NuGet 피드의 UnityEngine.Modules 패키지에서 받아 refs/ 에 둔다.
+    사용: ./check.sh   (또는 dotnet build -p:UnityVersion=6000.0.23 -p:LegacyInput=true)
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <UnityVersion Condition="'$(UnityVersion)' == ''">6000.0.23</UnityVersion>
+    <LegacyInput Condition="'$(LegacyInput)' == ''">true</LegacyInput>
+    <DefineConstants>UNITY_STANDALONE;UNITY_STANDALONE_WIN;ENABLE_MONO;NET_STANDARD_2_0;NET_STANDARD</DefineConstants>
+    <DefineConstants Condition="'$(LegacyInput)' == 'true'">$(DefineConstants);ENABLE_LEGACY_INPUT_MANAGER</DefineConstants>
+    <DefineConstants Condition="'$(LegacyInput)' != 'true'">$(DefineConstants);ENABLE_INPUT_SYSTEM</DefineConstants>
+    <BaseIntermediateOutputPath>obj/$(UnityVersion)-$(LegacyInput)/</BaseIntermediateOutputPath>
+    <OutputPath>bin/$(UnityVersion)-$(LegacyInput)/</OutputPath>
+    <NoWarn>$(NoWarn);CS1701;CS1702</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Assets/Scripts/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="refs/$(UnityVersion)/lib/net45/UnityEngine*.dll">
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>
